@@ -1,12 +1,26 @@
-import { use, useState } from 'react'
+import { use, useRef, useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import { useFormik } from 'formik'
-
+import * as Yup from 'yup';
+import {
+  Popover,
+  PopoverContent,
+  PopoverDescription,
+  PopoverHeader,
+  PopoverTitle,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { Calendar } from "@/components/ui/calendar"
+import { Paperclip, FileIcon, X } from "lucide-react"
 
 function App() {
   const [count, setCount] = useState(0)
+  const SPARef = useRef(null);
+  const handleFileClick = () => {
+    SPARef.current?.click();
+  }
   const formik = useFormik({
     initialValues: {
       Timestamp: '',
@@ -20,9 +34,28 @@ function App() {
       SPA_Authorization: '',
       LRA_Official_ID: '',
     },
-    validationSchema: null,
+    validationSchema: Yup.object({
+      Requestor_Name: Yup.string().required('Requestor Name is required').max(50, 'Requestor Name must be at most 50 characters'),
+      Data_Owner: Yup.string().required('Data Owner is required'),
+      Requester_Email: Yup.string().email('Invalid email address').required('Requester Email is required'),
+      Relation: Yup.string().when('Data_Owner', {
+        is: 'No',
+        then: (schema) => schema.required('Relation is required when Data Owner is No'),
+        otherwise: (schema) => schema.optional(),
+      }),
+      Issue_On: Yup.string().required('Issue On is required'),
+      Issue_at: Yup.string().required('Issue at is required'),
+    }),
     onSubmit: values => {
-      alert(JSON.stringify(values, null, 2));
+      formik.setFieldValue("Timestamp", new Date().toLocaleString());
+      console.log("Form values:", values);
+      // google.script.run.withSuccessHandler((response) => {
+      //   console.log("Data saved successfully:", response);
+      //   alert("Form submitted successfully!");
+      // }).withFailureHandler((error) => {
+      //   console.error("Error saving data:", error);
+      //   alert("Error submitting form. Please try again.");
+      // }).sampleFunction(values);
     },
   });
 
@@ -30,7 +63,7 @@ function App() {
   return (
     <>
       <div className='w-screen h-screen bg-gray-800 flex items-center justify-center'>
-        <div className='bg-white w-xl h-xl rounded-xl p-5 space-y-10'>
+        <div className='bg-white w-xl h-xl rounded-xl p-6 space-y-5'>
         <div className='text-black'>
           <p className='font-text'>Request for</p>
           <h1 className='text-4xl'>Certificate of Employment</h1>
@@ -38,98 +71,169 @@ function App() {
         <div>
           <form onSubmit={formik.handleSubmit} className='space-y-2'>
             <div>
-              <label className='font-text block text-sm font-medium text-gray-700 text-left mb-2' htmlFor="Requestor_Name">Requestor Name</label>
+              <div className='flex flex-row justify-between'>
+                <label className='font-text block text-sm font-medium text-gray-700 text-left mb-2' htmlFor="Requestor_Name">Requestor Name</label>
+                <p className='text-sm text-gray-500'>Required</p>
+              </div>
               <input
                 className='border text-black border-gray-300 rounded-md p-2 w-full '
                 id="Requestor_Name"
                 name="Requestor_Name"
                 type="text"
+                placeholder='Last Name, First Name, Middle Name '
+                maxLength="50"
+                onBlur={formik.handleBlur}
                 onChange={formik.handleChange}
                 value={formik.values.Requestor_Name}
               />
+              {formik.errors.Requestor_Name ? (
+                <p className="text-sm text-red-600">{formik.errors.Requestor_Name}</p>
+              ) : null}
             </div>
             <div>
-              <label className='font-text block text-sm font-medium text-gray-700 text-left mb-2' htmlFor="Data_Owner">Data Owner</label>
-              <input
-                className='border text-black border-gray-300 rounded-md p-2 w-full '
-                id="Data_Owner"
-                name="Data_Owner"
-                type="text"
-                onChange={formik.handleChange}
-                value={formik.values.Data_Owner}
-              />
+              <div className='flex justify-between'>
+                <label className='font-text block text-sm font-medium text-gray-700 text-left mb-2' htmlFor="Data_Owner">Data Owner</label>
+                <p className='text-sm text-gray-500'>Required</p>
+              </div>
+              <div className='flex flex-row text-black justify-between w-full gap-4'>
+                <div className={`flex flex-row items-center justify-center py-3 w-full rounded-lg border-gray-600 border hover:text-white hover:bg-gray-800 transition-all ease-in-out cursor-pointer ${formik.values.Data_Owner === "Yes" ? 'bg-gray-800 text-white' : ''}`}
+                  onClick={() => formik.setFieldValue("Data_Owner", "Yes")}>
+                    <p>Yes</p>
+                </div>
+                <div className={`flex flex-row items-center justify-center py-3 w-full rounded-lg border-gray-600 border hover:text-white hover:bg-gray-800 transition-all ease-in-out cursor-pointer ${formik.values.Data_Owner === "No" ? 'bg-gray-800 text-white' : ''}`}  
+                  onClick={() => formik.setFieldValue("Data_Owner", "No")}>
+                    <p>No</p>
+                </div>
+              </div>
+              {formik.errors.Data_Owner ? (
+                <p className="text-sm text-red-600">{formik.errors.Data_Owner}</p>
+              ) : null}
             </div>
             <div>
-              <label className='font-text block text-sm font-medium text-gray-700 text-left mb-2' htmlFor="Requester_Email">Requester Email</label>
+              <div className='flex justify-between'>
+                <label className='font-text block text-sm font-medium text-gray-700 text-left mb-2' htmlFor="Requester_Email">Requester Email</label>
+                <p className='text-sm text-gray-500'>Required</p>
+              </div>
               <input
                 className='border text-black border-gray-300 rounded-md p-2 w-full '
                 id="Requester_Email"
                 name="Requester_Email"
                 type="text"
+                placeholder='example@email.com'
                 onChange={formik.handleChange}
                 value={formik.values.Requester_Email}
               />
+              {formik.errors.Requester_Email ? (
+                <p className="text-sm text-red-600">{formik.errors.Requester_Email}</p>
+              ) : null}
             </div>
-            <div>
-              <label className='font-text block text-sm font-medium text-gray-700 text-left mb-2' htmlFor="Relation">Relation</label>
-              <input
-                className='border text-black border-gray-300 rounded-md p-2 w-full '
-                id="Relation"
-                name="Relation"
-                type="text"
-                onChange={formik.handleChange}
-                value={formik.values.Relation}
-              />
-            </div>
-            <div className='flex flex-row w-full justify-between'>
-                <div>
-                  <label className='font-text block text-sm font-medium text-gray-700 text-left mb-2' htmlFor="Issue_On">Issue On</label>
-                  <input
-                    className='border text-black border-gray-300 rounded-md p-2 w-full '
-                    id="Issue_On"
-                    name="Issue_On"
-                    type="text"
-                    onChange={formik.handleChange}
-                    value={formik.values.Issue_On}
-                  />
+            {
+              formik.values.Data_Owner === "No" && (<>
+              <div>
+                <div className='flex justify-between'>
+                  <label className='font-text block text-sm font-medium text-gray-700 text-left mb-2' htmlFor="Relation">Relation with the requester</label>
+                  <p className='text-sm text-gray-500'>Required</p>
                 </div>
-                <div>
-                  <label className='font-text block text-sm font-medium text-gray-700 text-left mb-2' htmlFor="Issue_at">Issue at</label>
+                <input
+                  className='border text-black border-gray-300 rounded-md p-2 w-full '
+                  id="Relation"
+                  name="Relation"
+                  type="text"
+                  disabled={formik.values.Data_Owner === "Yes" ? true : false}
+                  placeholder='e.g. Friend, Colleague, Manager'
+                  onChange={formik.handleChange}
+                  value={formik.values.Relation}
+                />
+              </div>
+              {formik.errors.Relation ? (
+                  <p className="text-sm text-red-600">{formik.errors.Relation}</p>
+                ) : null}
+              </>  
+          )
+            }
+            <div className='flex flex-row w-full justify-between gap-4'>
+                <div className='w-full'>
+                  <div className='flex flex-row w-full justify-between'>
+                    <label className='font-text block text-sm font-medium text-gray-700 text-left mb-2' htmlFor="Issue_on">Issue On</label>
+                    <p className='text-sm text-gray-500'>Required</p>
+                  </div>
+                  <div className='relative items-center justify-center gap-2'>
+                    {/* <input
+                      className='border text-black border-gray-300 rounded-md p-2 w-full '
+                      id="Issue_On"
+                      name="Issue_On"
+                      type="text"
+                      onChange={formik.handleChange}
+                      value={formik.values.Issue_On}
+                    /> */}
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <div className={`border text-black border-gray-300 rounded-md p-2 w-full ${formik.values.Issue_On ? "text-black" : "text-gray-500"}`}>{formik.values.Issue_On ? new Date(formik.values.Issue_On).toLocaleDateString() : "Select a date"}</div>
+                      </PopoverTrigger>
+                      <PopoverContent className={"p-0 w-fit"}>
+                        <Calendar
+                        mode="single"
+                        selected={formik.values.Issue_On ? new Date(formik.values.Issue_On) : undefined}
+                        onSelect={(date) => formik.setFieldValue("Issue_On", date.toISOString())}
+                        className="rounded-lg border"
+                        captionLayout="dropdown"
+                      />
+                      </PopoverContent>
+                    </Popover>
+                    {formik.errors.Issue_On ? (
+                    <p className="text-sm text-red-600">{formik.errors.Issue_On}</p>
+                  ) : null}
+                  </div>
+                </div>
+                <div className='w-full'>
+                  <div className='flex flex-row w-full justify-between'>
+                    <label className='font-text block text-sm font-medium text-gray-700 text-left mb-2' htmlFor="Issue_at">Issue at</label>
+                    <p className='text-sm text-gray-500'>Required</p>
+                  </div>
+                  
                   <input
                     className='border text-black border-gray-300 rounded-md p-2 w-full '
                     id="Issue_at"
                     name="Issue_at"
+                    placeholder='e.g. Company Name, City'
                     type="text"
                     onChange={formik.handleChange}
                     value={formik.values.Issue_at}
                   />
+                    {formik.errors.Issue_at ? (
+                    <p className="text-sm text-red-600">{formik.errors.Issue_at}</p>
+                  ) : null}
                 </div>
             </div>
-            <div>
-              <label className='font-text block text-sm font-medium text-gray-700 text-left mb-2' htmlFor="SPA_Authorization">SPA Authorization</label>
-              <input
-                className='border text-black border-gray-300 rounded-md p-2 w-full '
-                id="SPA_Authorization"
-                name="SPA_Authorization"
-                type="text"
-                onChange={formik.handleChange}
-                value={formik.values.SPA_Authorization}
-              />
-            </div>
-            <div>
-              <label className='font-text block text-sm font-medium text-gray-700 text-left mb-2' htmlFor="LRA_Official_ID">LRA Official ID</label>
-              <input
-                className='border text-black border-gray-300 rounded-md p-2 w-full '
-                id="LRA_Official_ID"
-                name="LRA_Official_ID"
-                type="text"
-                onChange={formik.handleChange}
-                value={formik.values.LRA_Official_ID}
-              />
+            <div className='flex flex-row w-full gap-4'>
+              <div className='w-full'>
+                {/* <input
+                  className='border text-black border-gray-300 rounded-md p-2 w-full '
+                  id="SPA_Authorization"
+                  name="SPA_Authorization"
+                  type="text"
+                  onChange={formik.handleChange}
+                  value={formik.values.SPA_Authorization}
+                /> */}
+                <input type="file" ref={SPARef} className='hidden' />
+                <div onClick={handleFileClick} className="p-10 border-dashed border-2 cursor-pointer">
+                  Click me to upload!
+              </div>
+              </div>
+              <div className='w-full'>
+                <input
+                  className='border text-black border-gray-300 rounded-md p-2 w-full '
+                  id="LRA_Official_ID"
+                  name="LRA_Official_ID"
+                  type="text"
+                  onChange={formik.handleChange}
+                  value={formik.values.LRA_Official_ID}
+                />
+              </div>
             </div>
             
 
-            <button type='submit' className='w-full mt-5 bg-blue-600 text-white font-text px-4 py-2 rounded-md hover:bg-blue-700'>Submit</button>
+            <button type='submit' className='w-full mt-5 bg-blue-600 text-white font-text px-4 py-2 rounded-md hover:bg-blue-700' onClick={() => formik.setFieldValue("Timestamp", new Date().toLocaleString())}>Submit</button>
           </form>
         </div>
       </div>
