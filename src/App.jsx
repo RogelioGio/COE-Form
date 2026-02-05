@@ -29,7 +29,8 @@ function App() {
 
   return (
     <>
-      <div className='bg-white w-xl h-xl rounded-xl p-5 space-y-10'>
+      <div className='w-screen h-screen bg-gray-800 flex items-center justify-center'>
+        <div className='bg-white w-xl h-xl rounded-xl p-5 space-y-10'>
         <div className='text-black'>
           <p className='font-text'>Request for</p>
           <h1 className='text-4xl'>Certificate of Employment</h1>
@@ -131,6 +132,7 @@ function App() {
             <button type='submit' className='w-full mt-5 bg-blue-600 text-white font-text px-4 py-2 rounded-md hover:bg-blue-700'>Submit</button>
           </form>
         </div>
+      </div>
       </div>
     </>
   )
