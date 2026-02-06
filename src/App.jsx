@@ -15,6 +15,7 @@ import {
 import { Calendar } from "@/components/ui/calendar"
 import { Paperclip, FileIcon, X } from "lucide-react"
 import { toast } from 'sonner'
+import { set } from 'date-fns'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -52,18 +53,59 @@ function App() {
       LRA_Official_ID: Yup.string().required('LRA Official ID is required'),
       ID_Number: Yup.string().required('ID Number is required').max(50, 'ID Number must be at most 50 characters'),
     }),
-    onSubmit: values => {
-      formik.setFieldValue("Timestamp", new Date().toLocaleString());
-      console.log("Form values:", values);
-      toast.success("Form submitted successfully!" );
-      // google.script.run.withSuccessHandler((response) => {
-      //   console.log("Data saved successfully:", response);
-      //   alert("Form submitted successfully!");
-      // }).withFailureHandler((error) => {
-      //   console.error("Error saving data:", error);
-      //   alert("Error submitting form. Please try again.");
-      // }).sampleFunction(values);
-    },
+   onSubmit: (values, { setSubmitting, resetForm }) => {
+  // 1. Create payload and CONVERT DATE TO STRING
+  const submissionData = {
+    ...values,
+    // Convert the Date object to a readable string (e.g., "2/6/2026")
+    Issue_On: values.Issue_On ? new Date(values.Issue_On).toLocaleDateString() : "",
+    Timestamp: new Date().toLocaleString()
+  };
+
+  // console.log("Sending to Server:", submissionData);
+
+  // 2. Call Google Apps Script
+  if (window.google && window.google.script) {
+    const request = window.google.script.run
+      .withSuccessHandler((response) => {
+        setSubmitting(false);
+        if (response && response.status === "success") {
+          resetForm();
+          setSPA({});   // Reset file UI
+          setLRAId({}); // Reset file UI
+        } else {
+          alert("Error: " + (response.message || "Unknown error"));
+        }
+      })
+      .withFailureHandler((error) => {
+        setSubmitting(false);
+        alert("System Error: " + error);
+      })
+    .saveForm(submissionData)
+    if(submitting){
+      return;
+    }else {
+      setSubmitting(true);
+    }
+
+    toast.promise(request, {
+      loading: "Submitting request...",
+      success: () => {
+        setSubmitting(false);
+        return "Request submitted successfully!";
+      },
+      error: (err) => {
+        setSubmitting(false);
+        return "Submission failed: " + err;
+      } // <--- This was the missing closing brace for the error function
+    });
+
+  } else {
+    // Fallback for local tesg(false);ting
+    console.log("Google Script not found (Local Mode)");
+    setSubmittin
+  }
+},
   });
 
   // Handle Filecheck
@@ -339,7 +381,11 @@ function App() {
                 <p className="text-sm text-red-600">{formik.errors.ID_Number}</p>
               ) : null}
             </div>
-            <button type='submit' className='w-full mt-5 bg-gray-800 text-white font-text rounded-md hover:bg-gray-700 p-5 transition-all ease-in-out cursor-pointer' onClick={() => formik.setFieldValue("Timestamp", new Date().toLocaleString())}>Submit</button>
+            <button type='submit' className='w-full mt-5 bg-gray-800 text-white font-text rounded-md hover:bg-gray-700 p-5 transition-all ease-in-out cursor-pointer' onClick={() => formik.setFieldValue("Timestamp", new Date().toLocaleString())} disabled={submitting}>
+              {
+                submitting ? "Submitting..." : "Submit Request"
+              }
+            </button>
           </form>
         </div>
       </div>
