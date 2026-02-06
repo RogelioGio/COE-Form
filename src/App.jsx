@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
 import { Paperclip, FileIcon, X } from "lucide-react"
+import { toast } from 'sonner'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -54,6 +55,7 @@ function App() {
     onSubmit: values => {
       formik.setFieldValue("Timestamp", new Date().toLocaleString());
       console.log("Form values:", values);
+      toast.success("Form submitted successfully!" );
       // google.script.run.withSuccessHandler((response) => {
       //   console.log("Data saved successfully:", response);
       //   alert("Form submitted successfully!");
@@ -141,16 +143,9 @@ function App() {
                 <p className='text-sm text-gray-500'>Required</p>
               </div>
               <div className='flex flex-row text-black justify-between w-full gap-4'>
-                {/* <div className={`flex flex-row items-center justify-center py-3 w-full rounded-lg border-gray-600 border hover:text-white hover:bg-gray-800 transition-all ease-in-out cursor-pointer ${formik.values.Data_Owner === "Yes" ? 'bg-gray-800 text-white' : ''}`}
-                  onClick={() => formik.setFieldValue("Data_Owner", "Yes")}>
-                    <p>Yes</p>
-                </div>
-                <div className={`flex flex-row items-center justify-center py-3 w-full rounded-lg border-gray-600 border hover:text-white hover:bg-gray-800 transition-all ease-in-out cursor-pointer ${formik.values.Data_Owner === "No" ? 'bg-gray-800 text-white' : ''}`}  
-                  onClick={() => formik.setFieldValue("Data_Owner", "No")}>
-                    <p>No</p>
-                </div> */}
-                <div className='flex flex-row w-full justify-around'>
-                  <div>
+                <div className='flex flex-row w-full justify-around gap-4'>
+                  <div className={`border border-gray-300 rounded-sm w-full p-4 cursor-pointer justify-between flex hover:bg-accent ${formik.values.Data_Owner === "Yes" ? 'bg-accent' : ''}`} onClick={()=>formik.setFieldValue('Data_Owner', 'Yes')}>
+                    <label htmlFor="dataOwnerYes">Yes</label>
                     <input
                       type="radio"
                       id="dataOwnerYes"
@@ -158,11 +153,10 @@ function App() {
                       value="Yes"
                       checked={formik.values.Data_Owner === "Yes"}
                       onChange={formik.handleChange}
-                      className='mr-2'
                     />
-                    <label htmlFor="dataOwnerYes">Yes</label>
                   </div>
-                  <div>
+                  <div className={`border border-gray-300 rounded-sm w-full p-4 cursor-pointer justify-between flex hover:bg-accent ${formik.values.Data_Owner === "No" ? 'bg-accent' : ''}`} onClick={()=>formik.setFieldValue('Data_Owner', 'No')}>
+                    <label htmlFor="dataOwnerNo">No</label>
                     <input
                       type="radio"
                       id="dataOwnerNo"
@@ -170,9 +164,7 @@ function App() {
                       value="No"
                       checked={formik.values.Data_Owner === "No"}
                       onChange={formik.handleChange}
-                      className='mr-2'
                     />
-                    <label htmlFor="dataOwnerNo">No</label>
                   </div>
                 </div>
               </div>
@@ -347,7 +339,7 @@ function App() {
                 <p className="text-sm text-red-600">{formik.errors.ID_Number}</p>
               ) : null}
             </div>
-            <button type='submit' className='w-full mt-5 bg-blue-600 text-white font-text px-4 py-2 rounded-md hover:bg-blue-700' onClick={() => formik.setFieldValue("Timestamp", new Date().toLocaleString())}>Submit</button>
+            <button type='submit' className='w-full mt-5 bg-gray-800 text-white font-text rounded-md hover:bg-gray-700 p-5 transition-all ease-in-out cursor-pointer' onClick={() => formik.setFieldValue("Timestamp", new Date().toLocaleString())}>Submit</button>
           </form>
         </div>
       </div>
