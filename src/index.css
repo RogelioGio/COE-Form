@@ -107,9 +107,7 @@ button:focus-visible {
   a:hover {
     color: #747bff;
   }
-  button {
-    
-  }
+  
 }
 
 @layer base {
@@ -210,4 +208,15 @@ button:focus-visible {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+
+@keyframes slideIn {
+  from { transform: translateY(100%);
+          opacity: 0; }
+  to { transform: translateY(0); 
+       opacity: 1; }
+}
+.animate-slideIn {
+  animation: slideIn 1s ease-out forwards;
 }
