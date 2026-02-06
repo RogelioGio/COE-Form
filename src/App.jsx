@@ -109,7 +109,7 @@ function App() {
 
   return (
     <>
-      <div className='w-screen h-screen bg-gray-800 flex items-center justify-center'>
+      <div className='w-screen sm:h-screen h-full bg-gray-800 flex items-center justify-center p-10'>
         <div className='bg-white w-xl h-xl rounded-xl p-6 space-y-5'>
         <div className='text-black'>
           <p className='font-text'>Request for</p>
@@ -268,7 +268,7 @@ function App() {
                   ) : null}
                 </div>
             </div>
-            <div className='flex flex-row w-full gap-4'>
+            <div className='flex sm:flex-row flex-col w-full gap-4'>
               {
                 formik.values.Data_Owner === "No" ? (
                   <div className='w-full'>
