@@ -17,10 +17,12 @@ import { Paperclip, FileIcon, X } from "lucide-react"
 
 function App() {
   const [count, setCount] = useState(0)
+
   const SPARef = useRef(null);
-  const handleFileClick = () => {
-    SPARef.current?.click();
-  }
+  const [spa, setSPA] = useState({});
+  const LRAIdRef = useRef(null);
+  const [LRAId, setLRAId] = useState({});
+
   const formik = useFormik({
     initialValues: {
       Timestamp: '',
@@ -45,6 +47,7 @@ function App() {
       }),
       Issue_On: Yup.string().required('Issue On is required'),
       Issue_at: Yup.string().required('Issue at is required'),
+      SPA_Authorization: Yup.string().required('SPA or Authorization is required'),
     }),
     onSubmit: values => {
       formik.setFieldValue("Timestamp", new Date().toLocaleString());
@@ -58,6 +61,46 @@ function App() {
       // }).sampleFunction(values);
     },
   });
+
+  // Handle Filecheck
+  const handleFileClick = () => {
+    SPARef.current?.click();
+  }
+  const uploadLRAIdClick = () => {
+    LRAIdRef.current?.click();
+  }
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+
+    setSPA({
+      name: file.name,
+      size: file.size,
+      type: file.type,
+    });
+
+    reader.onloadend = () => {
+      const base64String = reader.result.split(',')[1];
+      formik.setFieldValue("SPA_Authorization", base64String);
+    }
+    reader.readAsDataURL(file);
+  };
+  const handleLRAIdChange = (event) => {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    
+    setLRAId({
+      name: file.name,
+      size: file.size,
+      type: file.type,
+    });
+
+    reader.onloadend = () => {
+      const base64String = reader.result.split(',')[1];
+      formik.setFieldValue("LRA_Official_ID", base64String);
+    }
+    reader.readAsDataURL(file);
+  }
 
 
   return (
@@ -86,7 +129,7 @@ function App() {
                 onChange={formik.handleChange}
                 value={formik.values.Requestor_Name}
               />
-              {formik.errors.Requestor_Name ? (
+              {formik.touched.Requestor_Name && formik.errors.Requestor_Name ? (
                 <p className="text-sm text-red-600">{formik.errors.Requestor_Name}</p>
               ) : null}
             </div>
@@ -105,7 +148,7 @@ function App() {
                     <p>No</p>
                 </div>
               </div>
-              {formik.errors.Data_Owner ? (
+              {formik.touched.Data_Owner && formik.errors.Data_Owner ? (
                 <p className="text-sm text-red-600">{formik.errors.Data_Owner}</p>
               ) : null}
             </div>
@@ -123,7 +166,7 @@ function App() {
                 onChange={formik.handleChange}
                 value={formik.values.Requester_Email}
               />
-              {formik.errors.Requester_Email ? (
+              {formik.touched.Requester_Email && formik.errors.Requester_Email ? (
                 <p className="text-sm text-red-600">{formik.errors.Requester_Email}</p>
               ) : null}
             </div>
@@ -145,7 +188,7 @@ function App() {
                   value={formik.values.Relation}
                 />
               </div>
-              {formik.errors.Relation ? (
+              {formik.errors.Relation && formik.errors.Relation ? (
                   <p className="text-sm text-red-600">{formik.errors.Relation}</p>
                 ) : null}
               </>  
@@ -207,28 +250,47 @@ function App() {
             </div>
             <div className='flex flex-row w-full gap-4'>
               <div className='w-full'>
-                {/* <input
-                  className='border text-black border-gray-300 rounded-md p-2 w-full '
-                  id="SPA_Authorization"
-                  name="SPA_Authorization"
-                  type="text"
-                  onChange={formik.handleChange}
-                  value={formik.values.SPA_Authorization}
-                /> */}
-                <input type="file" ref={SPARef} className='hidden' />
-                <div onClick={handleFileClick} className="p-10 border-dashed border-2 cursor-pointer">
-                  Click me to upload!
-              </div>
+                  <div className='flex flex-row w-full justify-between'>
+                    <label className='font-text block text-sm font-medium text-gray-700 text-left mb-2' htmlFor="SPA_Authorization">SPA or Authorization</label>
+                    <p className='text-sm text-gray-500'>Required</p>
+                  </div>
+                <input type="file" ref={SPARef} className='hidden' onChange={handleFileChange} id='SPA_Authorization'/>
+                <div onClick={handleFileClick} className="p-10 border-dashed border-2 cursor-pointer rounded-2xl flex flex-row justify-center items-center hover:bg-gray-100 transition-all ease-in-out border-gray-300">
+                  <FileIcon className='mx-auto mb-2' />
+                  {
+                    spa.name ? (
+                      <div className='text-center'>
+                        <p className='font-text font-medium'>{spa.name}</p>
+                        <p className='text-sm text-gray-500'>{(spa.size / 1024).toFixed(2)} KB</p>
+                      </div>
+                    ) : (
+                      <p className='text-center text-gray-500 text-sm'>Click to upload SPA Authorization</p>
+                    )
+                  }
+                </div>
+                              {formik.touched.Data_Owner && formik.errors.Data_Owner ? (
+                <p className="text-sm text-red-600">{formik.errors.Data_Owner}</p>
+              ) : null}
               </div>
               <div className='w-full'>
-                <input
-                  className='border text-black border-gray-300 rounded-md p-2 w-full '
-                  id="LRA_Official_ID"
-                  name="LRA_Official_ID"
-                  type="text"
-                  onChange={formik.handleChange}
-                  value={formik.values.LRA_Official_ID}
-                />
+                    <div className='flex flex-row w-full justify-between'>
+                      <label className='font-text block text-sm font-medium text-gray-700 text-left mb-2' htmlFor="LRA_Official_ID">LRA Official ID</label>
+                      <p className='text-sm text-gray-500'>Required</p>
+                  </div>
+                  <input type="file" ref={LRAIdRef} className='hidden' onChange={handleLRAIdChange} id='LRA_Official_ID'/>
+                  <div onClick={uploadLRAIdClick} className="p-10 border-dashed border-2 cursor-pointer rounded-2xl flex flex-row justify-center items-center hover:bg-gray-100 transition-all ease-in-out border-gray-300">
+                  <FileIcon className='mx-auto mb-2' />
+                  {
+                    LRAId.name ? (
+                      <div className='text-center'>
+                        <p className='font-text font-medium'>{LRAId.name}</p>
+                        <p className='text-sm text-gray-500'>{(LRAId.size / 1024).toFixed(2)} KB</p>
+                      </div>
+                    ) : (
+                      <p className='text-center text-gray-500 text-sm'>Click to upload LRA Official ID</p>
+                    )
+                  }
+                </div>
               </div>
             </div>
             
