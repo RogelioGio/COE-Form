@@ -16,10 +16,25 @@ import { Calendar } from "@/components/ui/calendar"
 import { Paperclip, FileIcon, X } from "lucide-react"
 import { toast } from 'sonner'
 import { set } from 'date-fns'
-
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { ChevronDown } from 'lucide-react';
+ 
 function App() {
   const [count, setCount] = useState(0)
   const [submitting, setSubmitting] = useState(false);
+  const allowedFileTypes = ["application/pdf", "image/jpeg", "image/png"];
+  const allowedDomain = ["gmail.com", "yahoo.com", "outlook.com", "company.com"]; // Example allowed domains
+
 
   const SPARef = useRef(null);
   const [spa, setSPA] = useState({});
@@ -40,9 +55,17 @@ function App() {
       LRA_Official_ID: '',
     },
     validationSchema: Yup.object({
-      Requestor_Name: Yup.string().required('Requestor Name is required').max(50, 'Requestor Name must be at most 50 characters'),
+      Requestor_Name: Yup.string().required('Requestor Name is required').max(50, 'Requestor Name must be at most 50 characters').min(5, 'Requestor Name must be at least 5 characters') ,
       Data_Owner: Yup.string().required('Data Owner is required'),
-      Requester_Email: Yup.string().email('Invalid email address').required('Requester Email is required'),
+      Requester_Email: Yup.string().email('Invalid email address').required('Requester Email is required').test(
+      'is-company-domain',
+      'only valid email domains are allowed',
+      (value) => {
+        if (!value) return false; // If the field is empty, it's invalid
+        const domain = value.substring(value.lastIndexOf("@") + 1);
+        return allowedDomain.includes(domain.toLowerCase());
+      }
+    ),
       Relation: Yup.string().when('Data_Owner', {
         is: 'No',
         then: (schema) => schema.required('Relation is required when Data Owner is No'),
@@ -53,7 +76,7 @@ function App() {
       LRA_Official_ID: Yup.string().required('LRA Official ID is required'),
       ID_Number: Yup.string().required('ID Number is required').max(50, 'ID Number must be at most 50 characters'),
     }),
-   onSubmit: (values, { setSubmitting, resetForm }) => {
+   onSubmit: (values, {resetForm}) => {
   // 1. Create payload and CONVERT DATE TO STRING
   const submissionData = {
     ...values,
@@ -101,9 +124,16 @@ function App() {
     });
 
   } else {
-    // Fallback for local tesg(false);ting
-    console.log("Google Script not found (Local Mode)");
-    setSubmittin
+    // Fallback for local testing
+    if(submitting){
+      return;
+    }else {
+      setSubmitting(true);
+    }
+    toast.error("Google Script not found. Are you running in local mode?" );
+    setTimeout(() => {
+      setSubmitting(false);
+    }, 2000);
   }
 },
   });
@@ -112,12 +142,30 @@ function App() {
   const handleFileClick = () => {
     SPARef.current?.click();
   }
+  const handleDeleteFile = () => {
+    setSPA({});
+    formik.setFieldValue("SPA_Authorization", '');
+  }
   const uploadLRAIdClick = () => {
     LRAIdRef.current?.click();
+  }
+  const handleLRAIdDelete = () => {
+    setLRAId({});
+    formik.setFieldValue("LRA_Official_ID", '');
   }
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     const reader = new FileReader();
+
+    if(file.name === SPARef.current?.files[0]?.name){
+      toast.error("LRA Official ID cannot be the same file as SPA Authorization.");
+      return;
+    }
+
+    if(!allowedFileTypes.includes(file.type)){
+      toast.error("Invalid file type. Only PDF, JPG, and PNG are allowed.");
+      return;
+    }
 
     setSPA({
       name: file.name,
@@ -135,6 +183,17 @@ function App() {
     const file = event.target.files[0];
     const reader = new FileReader();
     
+    if(file.name === SPARef.current?.files[0]?.name){
+      toast.error("LRA Official ID cannot be the same file as SPA Authorization.");
+      return;
+    }
+
+
+    if(!allowedFileTypes.includes(file.type)){
+      toast.error("Invalid file type. Only PDF, JPG, and PNG are allowed.");
+      return;
+    }
+
     setLRAId({
       name: file.name,
       size: file.size,
@@ -169,10 +228,15 @@ function App() {
                 id="Requestor_Name"
                 name="Requestor_Name"
                 type="text"
+                pattern="^[a-zA-Z\s,]+$"
                 placeholder='Last Name, First Name, Middle Name '
                 maxLength="50"
+                minlength="5"
                 onBlur={formik.handleBlur}
-                onChange={formik.handleChange}
+                onChange={(e) => {
+                  const onlyLetters = e.target.value.replace(/[^a-zA-Z\s]/g, '');
+                  formik.setFieldValue("Requestor_Name", onlyLetters);
+                }}
                 value={formik.values.Requestor_Name}
               />
               {formik.touched.Requestor_Name && formik.errors.Requestor_Name ? (
@@ -239,7 +303,7 @@ function App() {
                   <label className='font-text block text-sm font-medium text-gray-700 text-left mb-2' htmlFor="Relation">Relation with the requester</label>
                   <p className='text-sm text-gray-500'>Required</p>
                 </div>
-                <input
+                {/* <input
                   className='border text-black border-gray-300 rounded-md p-2 w-full '
                   id="Relation"
                   name="Relation"
@@ -248,7 +312,24 @@ function App() {
                   placeholder='e.g. Friend, Colleague, Manager'
                   onChange={formik.handleChange}
                   value={formik.values.Relation}
-                />
+                /> */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <div className='border border-gray-200 p-2 rounded-md w-full text-left hover:bg-gray-100 cursor-pointer flex justify-between items-center'>
+                      <span className={`${formik.values.Relation ? "text-black" : "text-gray-500"}`}>{formik.values.Relation || "Select relation with the requester"}</span>
+                       <ChevronDown />
+                    </div>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuRadioGroup value={formik.values.Relation} onValueChange={(value) => formik.setFieldValue("Relation", value)}>
+                      <DropdownMenuRadioItem value="Colleague">Colleague</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="Manager">Manager</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="Family">Family</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="Other">Other</DropdownMenuRadioItem>
+                    </DropdownMenuRadioGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
               </div>
               {formik.touched.Relation && formik.errors.Relation ? (
                   <p className="text-sm text-red-600">{formik.errors.Relation}</p>
@@ -282,6 +363,7 @@ function App() {
                         onSelect={(date) => formik.setFieldValue("Issue_On", date)}
                         className="rounded-lg border"
                         captionLayout="dropdown"
+                        disabled={(date) => date < new Date()}
                       />
                       </PopoverContent>
                     </Popover>
@@ -310,20 +392,20 @@ function App() {
                   ) : null}
                 </div>
             </div>
-            <div className='flex sm:flex-row flex-col w-full gap-4'>
+            <div className='flex sm:flex-col flex-col w-full gap-4'>
               {
                 formik.values.Data_Owner === "No" ? (
                   <div className='w-full'>
                       <div className='flex flex-row w-full justify-between'>
                         <label className='font-text block text-sm font-medium text-gray-700 text-left mb-2' htmlFor="SPA_Authorization">SPA or Authorization</label>
                       </div>
-                    <input type="file" ref={SPARef} className='hidden' onChange={handleFileChange} id='SPA_Authorization'/>
-                    <div onClick={handleFileClick} className="p-10 border-dashed border-2 cursor-pointer rounded-2xl flex flex-row justify-center items-center hover:bg-gray-100 transition-all ease-in-out border-gray-300">
-                      <FileIcon className='mx-auto mb-2' />
+                    <input type="file" ref={SPARef} className='hidden' onChange={handleFileChange} id='SPA_Authorization' accept=".pdf, .jpg, .jpeg, .png"/>
+                    <div onClick={handleFileClick} className="p-10 gap-5 border-dashed border-2 cursor-pointer rounded-2xl flex flex-row justify-center items-center hover:bg-gray-100 transition-all ease-in-out border-gray-300">
+                      <FileIcon size={50} />
                       {
                         spa.name ? (
                           <div className='text-center'>
-                            <p className='font-text font-medium'>{spa.name}</p>
+                            <p className='font-text font-medium text-sm'>{spa.name}</p>
                             <p className='text-sm text-gray-500'>{(spa.size / 1024).toFixed(2)} KB</p>
                           </div>
                         ) : (
@@ -344,11 +426,11 @@ function App() {
                   </div>
                   <input type="file" ref={LRAIdRef} className='hidden' onChange={handleLRAIdChange} id='LRA_Official_ID'/>
                   <div onClick={uploadLRAIdClick} className="gap-2 p-10 border-dashed border-2 cursor-pointer rounded-2xl flex flex-row justify-center items-center hover:bg-gray-100 transition-all ease-in-out border-gray-300">
-                  <FileIcon className= {``} />
+                  <FileIcon size={50} />
                   {
                     LRAId.name ? (
                       <div className='text-center'>
-                        <p className='font-text font-medium'>{LRAId.name}</p>
+                        <p className='font-text font-medium text-sm'>{LRAId.name}</p>
                         <p className='text-sm text-gray-500'>{(LRAId.size / 1024).toFixed(2)} KB</p>
                       </div>
                     ) : (
@@ -374,14 +456,18 @@ function App() {
                 placeholder='00000000000'
                 maxLength="50"
                 onBlur={formik.handleBlur}
-                onChange={formik.handleChange}
                 value={formik.values.ID_Number}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const onlyNums = value.replace(/[^0-9]/g, '');
+                  formik.setFieldValue("ID_Number", onlyNums);
+                }}
               />
               {formik.touched.ID_Number && formik.errors.ID_Number ? (
                 <p className="text-sm text-red-600">{formik.errors.ID_Number}</p>
               ) : null}
             </div>
-            <button type='submit' className='w-full mt-5 bg-gray-800 text-white font-text rounded-md hover:bg-gray-700 p-5 transition-all ease-in-out cursor-pointer' onClick={() => formik.setFieldValue("Timestamp", new Date().toLocaleString())} disabled={submitting}>
+            <button type='submit' className={`w-full mt-5 bg-gray-800 text-white font-text rounded-md hover:bg-gray-700 p-5 transition-all ease-in-out cursor-pointer ${submitting ? "opacity-50 cursor-not-allowed" : ""}`} onClick={() => formik.setFieldValue("Timestamp", new Date().toLocaleString())} disabled={submitting}>
               {
                 submitting ? "Submitting..." : "Submit Request"
               }
