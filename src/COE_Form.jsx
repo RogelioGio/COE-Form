@@ -224,8 +224,7 @@ setTimeout(() => {
 
   return (
     <>
-      <div className='w-screen sm:h-screen h-full bg-gray-800 flex items-center justify-center p-10'>
-        <div className='bg-white w-xl h-xl rounded-xl p-6 space-y-5'>
+      <div className='bg-white w-xl h-xl rounded-xl p-6 space-y-5'>
         <div className='text-black'>
           <p className='font-text'>Request for</p>
           <h1 className='text-4xl'>Certificate of Employment</h1>
@@ -331,7 +330,7 @@ setTimeout(() => {
                   <DropdownMenuTrigger asChild>
                     <div className='border border-gray-200 p-2 rounded-md w-full text-left hover:bg-gray-100 cursor-pointer flex justify-between items-center'>
                       <span className={`${formik.values.Relation ? "text-black" : "text-gray-500"}`}>{formik.values.Relation || "Select relation with the requester"}</span>
-                       <ChevronDown />
+                       <ChevronDown className={`${formik.values.Relation ? "text-black" : "text-gray-500"}`}/>
                     </div>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
@@ -368,7 +367,10 @@ setTimeout(() => {
                     /> */}
                     <Popover>
                       <PopoverTrigger asChild>
-                        <div className={`border text-black border-gray-300 rounded-md p-2 w-full ${formik.values.Issue_On ? "text-black" : "text-gray-500"}`}>{formik.values.Issue_On ? new Date(formik.values.Issue_On).toLocaleDateString() : "Select a date"}</div>
+                        <div className={`border flex flex-row items-center justify-between text-black border-gray-300 rounded-md p-2 w-full ${formik.values.Issue_On ? "text-black" : "text-gray-500"}`}>
+                            {formik.values.Issue_On ? new Date(formik.values.Issue_On).toLocaleDateString() : "Select a date"}
+                            <ChevronDown className={`${formik.values.Issue_On ? "text-black" : "text-gray-500"}`}/>
+                          </div>
                       </PopoverTrigger>
                       <PopoverContent className={"p-0 w-fit"}>
                         <Calendar
@@ -498,7 +500,6 @@ setTimeout(() => {
             </button>
           </form>
         </div>
-      </div>
       </div>
     </>
   )

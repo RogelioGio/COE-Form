@@ -7,10 +7,11 @@ import '@fontsource/google-sans/500.css';
 import '@fontsource/google-sans/600.css';
 import '@fontsource/google-sans/700.css';
 import { Toaster } from "@/components/ui/sonner"
+import Layout from './Layout';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    <Layout />
     <Toaster />
   </StrictMode>,
 )
