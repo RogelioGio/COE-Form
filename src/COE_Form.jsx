@@ -226,8 +226,8 @@ setTimeout(() => {
     <>
       <div className='bg-white w-xl h-xl rounded-xl p-6 space-y-5'>
         <div className='text-black'>
-          <p className='font-text'>Request for</p>
-          <h1 className='text-4xl'>Certificate of Employment</h1>
+          <p className='font-text md:text-base text-xs'>Request for</p>
+          <h1 className='md:text-4xl text-xl'>Certificate of Employment</h1>
         </div>
         <div>
           <form onSubmit={formik.handleSubmit} className='space-y-2'>
@@ -263,7 +263,7 @@ setTimeout(() => {
               </div>
               <div className='flex flex-row text-black justify-between w-full gap-4'>
                 <div className='flex flex-row w-full justify-around gap-4'>
-                  <div className={`border border-gray-300 rounded-sm w-full p-4 cursor-pointer justify-between flex hover:bg-accent ${formik.values.Data_Owner === "Yes" ? 'bg-accent' : ''}`} onClick={()=>formik.setFieldValue('Data_Owner', 'Yes')}>
+                  <div className={`border border-gray-300 rounded-sm w-full md:p-4 p-2 cursor-pointer justify-between flex hover:bg-accent ${formik.values.Data_Owner === "Yes" ? 'bg-accent' : ''}`} onClick={()=>formik.setFieldValue('Data_Owner', 'Yes')}>
                     <label htmlFor="dataOwnerYes">Yes</label>
                     <input
                       type="radio"
@@ -274,7 +274,7 @@ setTimeout(() => {
                       onChange={formik.handleChange}
                     />
                   </div>
-                  <div className={`border border-gray-300 rounded-sm w-full p-4 cursor-pointer justify-between flex hover:bg-accent ${formik.values.Data_Owner === "No" ? 'bg-accent' : ''}`} onClick={()=>formik.setFieldValue('Data_Owner', 'No')}>
+                  <div className={`border border-gray-300 rounded-sm w-full md:p-4 p-2 cursor-pointer justify-between flex hover:bg-accent ${formik.values.Data_Owner === "No" ? 'bg-accent' : ''}`} onClick={()=>formik.setFieldValue('Data_Owner', 'No')}>
                     <label htmlFor="dataOwnerNo">No</label>
                     <input
                       type="radio"
@@ -350,7 +350,7 @@ setTimeout(() => {
               </>  
           )
             }
-            <div className='flex flex-row w-full justify-between gap-4'>
+            <div className='flex md:flex-row flex-col w-full justify-between gap-4'>
                 <div className='w-full'>
                   <div className='flex flex-row w-full justify-between'>
                     <label className='font-text block text-sm font-medium text-gray-700 text-left mb-2' htmlFor="Issue_on">Issue On</label>
