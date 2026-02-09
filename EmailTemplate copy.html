@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head><base target="_top"></head>
+<body style="font-family: sans-serif; padding: 20px;">
+  <div style="max-width: 600px; border: 1px solid #eee; padding: 20px; border-radius: 10px;">
+    <h2 style="color: #1a73e8;">Employee COE Request</h2>
+    <hr>
+    <p>A new request has been filed. Details below:</p>
+    
+    <table style="width: 100%; text-align: left;">
+      <tr><th>Employee Name:</th><td><?= data.name ?></td></tr>
+      <tr><th>ID Number:</th><td><?= data.id ?></td></tr>
+      <tr><th>Email:</th><td><?= data.email ?></td></tr>
+      <tr><th>Data Owner:</th><td><?= data.owner ?></td></tr>
+      <tr><th>Relationship:</th><td><?= data.relation ?></td></tr>
+      <tr><th>Issued on:</th><td><?= data.date ?></td></tr>
+      <tr><th>Office/Department:</th><td><?= data.place ?></td></tr>
+    </table>
+
+    <div style="margin-top: 20px; background: #f8f9fa; padding: 15px;">
+      <p><strong>Documents:</strong></p>
+      <a href="<?= data.lraLink ?>" style="color: blue;">View LRA ID</a><br>
+      <a href="<?= data.spaLink ?>" style="color: blue;">View SPA/Auth</a>
+    </div>
+  </div>
+</body>
+</html>g
