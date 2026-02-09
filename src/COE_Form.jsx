@@ -54,7 +54,7 @@ export default function COE_Form({ submitted ,setSubmitted }) {
       LRA_Official_ID: '',
     },
     validationSchema: Yup.object({
-      Requestor_Name: Yup.string().trim().required('Requestor Name is required').max(50, 'Requestor Name must be at most 50 characters').min(5, 'Requestor Name must be at least 5 characters') ,
+      Requestor_Name: Yup.string().trim().required('Requestor Name is required').max(50, 'Requestor Name must be at most 50 characters').min(5, 'Requestor Name must be at least 5 characters').matches(/^[a-zA-Z\s.,]+$/, 'Requestor Name can only contain letters, spaces, and commas'),
       Data_Owner: Yup.string().required('Data Owner is required'),
       Requester_Email: Yup.string().email('Invalid email address').required('Requester Email is required').test(
       'is-company-domain',
@@ -240,13 +240,13 @@ setTimeout(() => {
                 id="Requestor_Name"
                 name="Requestor_Name"
                 type="text"
-                pattern="^[a-zA-Z\s,]+$"
+                pattern="/^[a-zA-Z\s.,]+$/"
                 placeholder='Last Name, First Name, Middle Name '
                 maxLength="50"
                 minlength="5"
                 onBlur={formik.handleBlur}
                 onChange={(e) => {
-                  const onlyLetters = e.target.value.replace(/[^a-zA-Z\s]/g, '');
+                  const onlyLetters = e.target.value.replace(/[^a-zA-Z\s.,]/g, '');
                   formik.setFieldValue("Requestor_Name", onlyLetters);
                 }}
                 value={formik.values.Requestor_Name}
