@@ -54,7 +54,7 @@ export default function COE_Form({ submitted ,setSubmitted }) {
       LRA_Official_ID: '',
     },
     validationSchema: Yup.object({
-      Requestor_Name: Yup.string().required('Requestor Name is required').max(50, 'Requestor Name must be at most 50 characters').min(5, 'Requestor Name must be at least 5 characters') ,
+      Requestor_Name: Yup.string().trim().required('Requestor Name is required').max(50, 'Requestor Name must be at most 50 characters').min(5, 'Requestor Name must be at least 5 characters') ,
       Data_Owner: Yup.string().required('Data Owner is required'),
       Requester_Email: Yup.string().email('Invalid email address').required('Requester Email is required').test(
       'is-company-domain',
