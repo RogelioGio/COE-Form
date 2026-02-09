@@ -389,14 +389,14 @@ setTimeout(() => {
                 </div>
                 <div className='w-full'>
                   <div className='flex flex-row w-full justify-between'>
-                    <label className='font-text block text-sm font-medium text-gray-700 text-left mb-2' htmlFor="Issue_at">Issue at</label>
+                    <label className='font-text block text-sm font-medium text-gray-700 text-left mb-2' htmlFor="officeDepartment">Office/Department</label>
                     <p className='text-sm text-gray-500'>Required</p>
                   </div>
                   
                   <input
                     className='border text-black border-gray-300 rounded-md p-2 w-full '
-                    id="Issue_at"
-                    name="Issue_at"
+                    id="officeDepartment"
+                    name="officeDepartment"
                     placeholder='e.g. Company Name, City'
                     type="text"
                     onChange={formik.handleChange}
