@@ -54,7 +54,7 @@ export default function COE_Form({ submitted ,setSubmitted }) {
       LRA_Official_ID: '',
     },
     validationSchema: Yup.object({
-      Requestor_Name: Yup.string().trim().required('Requestor Name is required').max(50, 'Requestor Name must be at most 50 characters').min(5, 'Requestor Name must be at least 5 characters').matches(/^[a-zA-Z\s.,]+$/, 'Requestor Name can only contain letters, spaces, and commas'),
+      Requestor_Name: Yup.string().trim().required('Requestor Name is required').max(50, 'Must be at most 50 characters').min(5, 'Must be at least 5 characters').matches(/^[a-zA-Z\s.,]+$/, 'Name can only contain letters, spaces, commas, and periods'),
       Data_Owner: Yup.string().required('Data Owner is required'),
       Requester_Email: Yup.string().email('Invalid email address').required('Requester Email is required').test(
       'is-company-domain',
@@ -71,9 +71,9 @@ export default function COE_Form({ submitted ,setSubmitted }) {
         otherwise: (schema) => schema.optional(),
       }),
       Issue_On: Yup.string().required('Issue On is required'),
-      officeDepartment: Yup.string().required('Office/Department is required'),
+      officeDepartment: Yup.string().required('Office/Department is required').max(100, 'Office/Department must be at most 100 characters').min(2, 'Office/Department must be at least 2 characters'),
       LRA_Official_ID: Yup.string().required('LRA Official ID is required'),
-      ID_Number: Yup.string().required('ID Number is required').max(50, 'ID Number must be at most 50 characters'),
+      ID_Number: Yup.string().required('ID Number is required').max(7, 'ID Number must be at most 7 characters').trim(),
     }),
    onSubmit: (values, {resetForm}) => {
   // 1. Create payload and CONVERT DATE TO STRING
@@ -240,7 +240,6 @@ setTimeout(() => {
                 id="Requestor_Name"
                 name="Requestor_Name"
                 type="text"
-                pattern="/^[a-zA-Z\s.,]+$/"
                 placeholder='Last Name, First Name, Middle Name '
                 maxLength="50"
                 minlength="5"
@@ -479,13 +478,13 @@ setTimeout(() => {
                 name="ID_Number"
                 type="text"
                 placeholder='00000000000'
-                maxLength="50"
+                maxLength="7"
                 onBlur={formik.handleBlur}
                 value={formik.values.ID_Number}
                 onChange={(e) => {
-                  const value = e.target.value;
-                  const onlyNums = value.replace(/[^0-9]/g, '');
-                  formik.setFieldValue("ID_Number", onlyNums);
+                  const allowedChars = e.target.value.replace(/[^a-zA-Z0-9]/g, '');
+                  //const onlyNums = value.replace(/[^0-9]/g, '');
+                  formik.setFieldValue("ID_Number", allowedChars);
                 }}
               />
               {formik.touched.ID_Number && formik.errors.ID_Number ? (

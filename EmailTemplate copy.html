@@ -16,9 +16,9 @@
       <tr><th>Employee Name:</th><td><?= data.name ?></td></tr>
       <tr><th>ID Number:</th><td><?= data.id ?></td></tr>
       <tr><th>Email:</th><td><?= data.email ?></td></tr>
-      <tr><th>Data Owner:</th><td><?= data.owner ?></td></tr>
 
       <? if (data.owner == 'No') { ?>
+        <tr><th>Data Owner:</th><td><?= data.owner ?></td></tr>
         <tr><th>Relationship:</th><td><?= data.relation ?></td></tr>
       <? } ?>
 
