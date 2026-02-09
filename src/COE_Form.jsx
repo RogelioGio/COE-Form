@@ -49,7 +49,7 @@ export default function COE_Form({ submitted ,setSubmitted }) {
       Relation: '',
       ID_Number: '',
       Issue_On: '',
-      Issue_at: '',
+      officeDepartment: '',
       SPA_Authorization: '',
       LRA_Official_ID: '',
     },
@@ -71,7 +71,7 @@ export default function COE_Form({ submitted ,setSubmitted }) {
         otherwise: (schema) => schema.optional(),
       }),
       Issue_On: Yup.string().required('Issue On is required'),
-      Issue_at: Yup.string().required('Issue at is required'),
+      officeDepartment: Yup.string().required('Office/Department is required'),
       LRA_Official_ID: Yup.string().required('LRA Official ID is required'),
       ID_Number: Yup.string().required('ID Number is required').max(50, 'ID Number must be at most 50 characters'),
     }),
@@ -400,10 +400,10 @@ setTimeout(() => {
                     placeholder='e.g. Company Name, City'
                     type="text"
                     onChange={formik.handleChange}
-                    value={formik.values.Issue_at}
+                    value={formik.values.officeDepartment}
                   />
-                    {formik.touched.Issue_at && formik.errors.Issue_at ? (
-                    <p className="text-sm text-red-600">{formik.errors.Issue_at}</p>
+                    {formik.touched.officeDepartment && formik.errors.officeDepartment ? (
+                    <p className="text-sm text-red-600">{formik.errors.officeDepartment}</p>
                   ) : null}
                 </div>
             </div>

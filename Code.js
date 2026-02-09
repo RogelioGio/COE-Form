@@ -33,7 +33,7 @@ function saveForm(values) {
     if (!Data_Owner) return {status: "error", message: "Data Owner is required"};
     if (!Requester_Email) return {status: "error", message: "Email is required"};
     if (!Issue_On) return {status: "error", message: "Issue Date is required"};
-    if (!OfficeDepartment) return {status: "error", message: "Issue Place is required"};
+    if (!OfficeDepartment) return {status: "error", message: "Office/Department is required"};
     if (!ID_Number) return {status: "error", message: "ID Number is required"};
 
     //rel
