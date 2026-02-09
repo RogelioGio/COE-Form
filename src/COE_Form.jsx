@@ -84,58 +84,57 @@ export default function COE_Form({ submitted ,setSubmitted }) {
     Timestamp: new Date().toLocaleString()
   };
 
-  // console.log("Sending to Server:", submissionData);
+  console.log("Sending to Server:", submissionData);
 
-  // 2. Call Google Apps Script
-//   if (window.google && window.google.script) {
-//     const request = window.google.script.run
-//       .withSuccessHandler((response) => {
-//         setSubmitting(false);
-//         if (response && response.status === "success") {
-//           resetForm();
-//           setSPA({});   // Reset file UI
-//           setLRAId({}); // Reset file UI
-//           setSubmitted(true);
-//         } else {
-//           alert("Error: " + (response.message || "Unknown error"));
-//         }
-//       })
-//       .withFailureHandler((error) => {
-//         setSubmitting(false);
-//         alert("System Error: " + error);
-//       })
-//     .saveForm(submissionData)
-//     if(submitting){
-//       return;
-//     }else {
-//       setSubmitting(true);
-//       setSubmitted(true);
-//     }
+  if (window.google && window.google.script) {
+    const request = window.google.script.run
+      .withSuccessHandler((response) => {
+        setSubmitting(false);
+        if (response && response.status === "success") {
+          resetForm();
+          setSPA({});   // Reset file UI
+          setLRAId({}); // Reset file UI
+          setSubmitted(true);
+        } else {
+          alert("Error: " + (response.message || "Unknown error"));
+        }
+      })
+      .withFailureHandler((error) => {
+        setSubmitting(false);
+        alert("System Error: " + error);
+      })
+    .saveForm(submissionData)
+    if(submitting){
+      return;
+    }else {
+      setSubmitting(true);
+      setSubmitted(true);
+    }
 
-//     toast.promise(request, {
-//       loading: "Submitting request...",
-//       success: () => {
-//         setSubmitting(false);
-//         return "Request submitted successfully!";
-//       },
-//       error: (err) => {
-//         setSubmitting(false);
-//         return "Submission failed: " + err;
-//       } // <--- This was the missing closing brace for the error function
-//     });
+    toast.promise(request, {
+      loading: "Submitting request...",
+      success: () => {
+        setSubmitting(false);
+        return "Request submitted successfully!";
+      },
+      error: (err) => {
+        setSubmitting(false);
+        return "Submission failed: " + err;
+      } // <--- This was the missing closing brace for the error function
+    });
 
-//   } else {
-//     // Fallback for local testing
-//     if(submitting){
-//       return;
-//     }else {
-//       setSubmitting(true);
-//     }
-//     toast.error("Google Script not found. Are you running in local mode?" );
-//     setTimeout(() => {
-//       setSubmitting(false);
-//     }, 2000);
-//   }
+  } else {
+    // Fallback for local testing
+    if(submitting){
+      return;
+    }else {
+      setSubmitting(true);
+    }
+    toast.error("Google Script not found. Are you running in local mode?" );
+    setTimeout(() => {
+      setSubmitting(false);
+    }, 2000);
+  }
 
 // For the purpose of this demo, we'll simulate a successful submission with a timeout
 if(submitting){

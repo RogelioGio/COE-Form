@@ -1,8 +1,9 @@
 function doGet() {
   return HtmlService
     .createHtmlOutputFromFile("index")
-    .setTitle("LRA Request System")
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+    .setTitle("Certificate of Employment")
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
 
 
@@ -22,7 +23,7 @@ function saveForm(values) {
       Relation,
       ID_Number,
       Issue_On,
-      Issue_at,
+      OfficeDepartment,
       SPA_Authorization,
       LRA_Official_ID
     } = values;
@@ -32,8 +33,8 @@ function saveForm(values) {
     if (!Data_Owner) return {status: "error", message: "Data Owner is required"};
     if (!Requester_Email) return {status: "error", message: "Email is required"};
     if (!Issue_On) return {status: "error", message: "Issue Date is required"};
-    if (!Issue_at) return {status: "error", message: "Issue Place is required"};
-    // if (!ID_Number) return {status: "error", message: "ID Number is required"};
+    if (!OfficeDepartment) return {status: "error", message: "Issue Place is required"};
+    if (!ID_Number) return {status: "error", message: "ID Number is required"};
 
     //rel
     if (Data_Owner === "No") {
@@ -68,10 +69,10 @@ function saveForm(values) {
       Requestor_Name,
       Data_Owner,
       Requester_Email,
-      Relation || "Self",
-      ID_Number || "N/A",
+      Relation,
+      ID_Number,
       Issue_On,
-      Issue_at,
+      OfficeDepartment,
       spaLink,
       lraLink
     ]);
